@@ -1,6 +1,12 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 
+import 'package:flutter_to_do/db.dart';
+
+
 class Home extends StatelessWidget {
+  String title = '';
+  String itemDescription = '';
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -16,6 +22,9 @@ class Home extends StatelessWidget {
               Padding(
                 padding: EdgeInsets.only(left: 20.0, right: 20.0, top: 50.0),
                 child: TextField(
+                  onChanged: (text) {
+                    title = text;
+                  },
                   textCapitalization: TextCapitalization.sentences,
                   style: TextStyle(fontSize: 27.0),
                   decoration: InputDecoration(
@@ -28,6 +37,9 @@ class Home extends StatelessWidget {
               Padding(
                 padding: EdgeInsets.only(left: 20.0, right: 20.0, top: 40.0),
                 child: TextField(
+                  onChanged: (text) {
+                    itemDescription = text;
+                  },
                   maxLines: 8,
                   style: TextStyle(fontSize: 20.0),
                   textCapitalization: TextCapitalization.sentences,
@@ -45,7 +57,11 @@ class Home extends StatelessWidget {
                     width: 365.0,
                     height:70.0,
                     child: RaisedButton(
-                  onPressed: () {},
+                  onPressed: () async {
+                    var randomId = new Random();
+                    var item = ToDoItem(id: randomId.nextInt(100), title: title, description: itemDescription);
+                    await DatabaseConnection.db.insertItem(item);
+                  },
                   color: Colors.blue,
                   child: Text(
                     'Save',
