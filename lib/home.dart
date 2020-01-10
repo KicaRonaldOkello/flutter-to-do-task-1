@@ -1,6 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_to_do/db.dart';
 
 
@@ -58,9 +58,29 @@ class Home extends StatelessWidget {
                     height:70.0,
                     child: RaisedButton(
                   onPressed: () async {
-                    var randomId = new Random();
-                    var item = ToDoItem(id: randomId.nextInt(100), title: title, description: itemDescription);
-                    await DatabaseConnection.db.insertItem(item);
+                    try {
+                      var randomId = new Random();
+                      var item = ToDoItem(id: randomId.nextInt(100), title: title, description: itemDescription);
+                      await DatabaseConnection.db.insertItem(item);
+                      
+                      Fluttertoast.showToast(
+                        msg: 'Note saved successfully',
+                        toastLength: Toast.LENGTH_SHORT,
+                        gravity: ToastGravity.TOP,
+                        timeInSecForIos: 1,
+                        fontSize: 16.0
+                    );
+                    } catch (e) {
+                       Fluttertoast.showToast(
+                        msg: 'Note not saved',
+                        toastLength: Toast.LENGTH_SHORT,
+                        gravity: ToastGravity.TOP,
+                        timeInSecForIos: 1,
+                        backgroundColor: Colors.red,
+                        textColor: Colors.white,
+                        fontSize: 16.0
+                    );
+                    }
                   },
                   color: Colors.blue,
                   child: Text(
