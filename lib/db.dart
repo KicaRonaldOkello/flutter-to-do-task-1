@@ -45,14 +45,14 @@ class DatabaseConnection {
     return res;
   }
 
-    Future<List<ToDoItem>> dogs() async {
-    // Get a reference to the database.
+    Future<List<ToDoItem>> getToDoItems() async {
+
     final Database db = await database;
 
-    // Query the table for all The Dogs.
+
     final List<Map<String, dynamic>> maps = await db.query('todolist');
 
-    // Convert the List<Map<String, dynamic> into a List<Dog>.
+
     return List.generate(maps.length, (i) {
       return ToDoItem(
         id: maps[i]['id'],

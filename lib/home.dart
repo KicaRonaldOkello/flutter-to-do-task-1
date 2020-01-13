@@ -70,6 +70,8 @@ class Home extends StatelessWidget {
                         timeInSecForIos: 1,
                         fontSize: 16.0
                     );
+
+                    Navigator.pushNamed(context, '/listItems');
                     } catch (e) {
                        Fluttertoast.showToast(
                         msg: 'Note not saved',
