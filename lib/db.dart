@@ -4,7 +4,6 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
 class DatabaseConnection {
-
   DatabaseConnection._();
 
   static final db = DatabaseConnection._();
@@ -12,8 +11,7 @@ class DatabaseConnection {
   static Database _database;
 
   Future<Database> get database async {
-    if (_database != null)
-    return _database;
+    if (_database != null) return _database;
 
     // if _database is null we instantiate it
     _database = await initDB();
@@ -45,13 +43,9 @@ class DatabaseConnection {
     return res;
   }
 
-    Future<List<ToDoItem>> getToDoItems() async {
-
+  Future<List<ToDoItem>> getToDoItems() async {
     final Database db = await database;
-
-
     final List<Map<String, dynamic>> maps = await db.query('todolist');
-
 
     return List.generate(maps.length, (i) {
       return ToDoItem(
@@ -60,6 +54,23 @@ class DatabaseConnection {
         description: maps[i]['description'],
       );
     });
+  }
+
+  Future<void> deleteToDOItem(int id) async {
+    final db = await database;
+
+    await db.delete(
+      'todolist',
+      where: "id = ?",
+      whereArgs: [id],
+    );
+  }
+
+  Future<void> upDateToDoItem(ToDoItem toDoItem) async {
+    final db = await database;
+    var response = await db.update("todolist", toDoItem.toMap(),
+        where: "id = ?", whereArgs: [toDoItem.id]);
+    return response;
   }
 }
 
@@ -78,7 +89,7 @@ class ToDoItem {
     };
   }
 
-    @override
+  @override
   String toString() {
     return 'Item{id: $id, title: $title, description: $description}';
   }

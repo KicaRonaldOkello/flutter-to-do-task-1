@@ -7,6 +7,22 @@ import 'package:flutter_to_do/db.dart';
 class Home extends StatelessWidget {
   String title = '';
   String itemDescription = '';
+
+  // Future<void> _updateToDoItem() async {
+  //   switch(await showDialog(
+  //     context: context,
+  //     builder: (BuildContext context) {
+  //       return SimpleDialog(
+  //         title: Text('Update Item'),
+  //         children: <Widget>[
+
+  //         ],
+  //       );
+  //     }
+  //   )) {
+  //     case
+  //   }
+  // }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -62,6 +78,9 @@ class Home extends StatelessWidget {
                       var randomId = new Random();
                       var item = ToDoItem(id: randomId.nextInt(100), title: title, description: itemDescription);
                       await DatabaseConnection.db.insertItem(item);
+
+                      title = '';
+                      itemDescription = '';
                       
                       Fluttertoast.showToast(
                         msg: 'Note saved successfully',
