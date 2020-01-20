@@ -8,21 +8,6 @@ class Home extends StatelessWidget {
   String title = '';
   String itemDescription = '';
 
-  // Future<void> _updateToDoItem() async {
-  //   switch(await showDialog(
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return SimpleDialog(
-  //         title: Text('Update Item'),
-  //         children: <Widget>[
-
-  //         ],
-  //       );
-  //     }
-  //   )) {
-  //     case
-  //   }
-  // }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
