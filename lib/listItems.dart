@@ -1,6 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'bloc/todolist_bloc.dart';
+import 'bloc/todolist_event.dart';
+import 'bloc/todolist_state.dart';
 import 'db.dart';
 
 class ListState extends StatefulWidget {
@@ -11,10 +15,13 @@ class ListState extends StatefulWidget {
 class ListItems extends State<ListState> {
   bool _switchValue;
 
+  TodolistBloc toDoItemBloc = TodolistBloc();
+
   @override
   void initState() {
     super.initState();
     this._switchValue = false;
+    toDoItemBloc.add(GetToDoList());
   }
 
   int id;
@@ -79,10 +86,9 @@ class ListItems extends State<ListState> {
                           id: id,
                           title: myTitleController.text,
                           description: myDescriptionController.text);
-                      await DatabaseConnection.db.upDateToDoItem(item);
-                      setState(() {
-                        this._switchValue = true;
-                      });
+
+                      toDoItemBloc.add(UpdateToDoList(item));
+                      toDoItemBloc.add(GetToDoList());
                       Navigator.of(context).pop();
                     },
                     borderSide: BorderSide(
@@ -97,94 +103,97 @@ class ListItems extends State<ListState> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('To Do Items'),
-        centerTitle: true,
-      ),
-      body: FutureBuilder<List<ToDoItem>>(
-          future: DatabaseConnection.db.getToDoItems(),
-          builder:
-              (BuildContext context, AsyncSnapshot<List<ToDoItem>> snapshot) {
-            if (snapshot.hasData) {
-              return ListView.builder(
-                itemCount: snapshot.data.length,
-                itemBuilder: (BuildContext context, int index) {
-                  ToDoItem item = snapshot.data[index];
+        appBar: AppBar(
+          title: Text('To Do Items'),
+          centerTitle: true,
+        ),
+        body: Container(
+          child: BlocBuilder(
+              bloc: toDoItemBloc,
+              builder: (BuildContext context, TodolistState state) {
+                if (state is GetTodolistState) {
+                  return ListView.builder(
+                    itemCount: state.items.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      ToDoItem item = state.items[index];
 
-                  return Padding(
-                      padding: EdgeInsets.only(
-                          bottom: 10.0, left: 10.0, right: 10.0),
-                      child: Card(
-                        child: Column(
-                          children: <Widget>[
-                            ListTile(
-                              title: Padding(
-                                padding: EdgeInsets.only(bottom: 20.0),
-                                child: Center(
-                                  child: Text(
-                                    item.title,
-                                    style: TextStyle(
-                                        fontSize: 25.0,
-                                        fontWeight: FontWeight.w500),
-                                  ),
-                                ),
-                              ),
-                              subtitle: Text(
-                                item.description,
-                                style: TextStyle(fontSize: 20.0),
-                              ),
-                            ),
-                            Padding(
-                                padding: EdgeInsets.all(20.0),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: <Widget>[
-                                    InkWell(
-                                      onTap: () {
-                                        id = item.id;
-                                        myTitleController.text = item.title;
-                                        myDescriptionController.text =
-                                            item.description;
-                                        createAlertDialog(context);
-                                      },
+                      return Padding(
+                          padding: EdgeInsets.only(
+                              bottom: 10.0, left: 10.0, right: 10.0),
+                          child: Card(
+                            child: Column(
+                              children: <Widget>[
+                                ListTile(
+                                  title: Padding(
+                                    padding: EdgeInsets.only(bottom: 20.0),
+                                    child: Center(
                                       child: Text(
-                                        'UPDATE',
+                                        item.title,
                                         style: TextStyle(
-                                            fontWeight: FontWeight.w700,
-                                            color: Colors.blue,
-                                            fontSize: 18.0),
+                                            fontSize: 25.0,
+                                            fontWeight: FontWeight.w500),
                                       ),
                                     ),
-                                    OutlineButton(
-                                        color: Colors.blue,
-                                        child: Text(
-                                          'Delete',
-                                          style: TextStyle(
+                                  ),
+                                  subtitle: Text(
+                                    item.description,
+                                    style: TextStyle(fontSize: 20.0),
+                                  ),
+                                ),
+                                Padding(
+                                    padding: EdgeInsets.all(20.0),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: <Widget>[
+                                        InkWell(
+                                          onTap: () {
+                                            id = item.id;
+                                            myTitleController.text = item.title;
+                                            myDescriptionController.text =
+                                                item.description;
+                                            createAlertDialog(context);
+                                          },
+                                          child: Text(
+                                            'UPDATE',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.w700,
+                                                color: Colors.blue,
+                                                fontSize: 18.0),
+                                          ),
+                                        ),
+                                        OutlineButton(
+                                            color: Colors.blue,
+                                            child: Text(
+                                              'Delete',
+                                              style: TextStyle(
+                                                  color: Colors.blue,
+                                                  fontSize: 18.0),
+                                            ),
+                                            borderSide: BorderSide(
                                               color: Colors.blue,
-                                              fontSize: 18.0),
-                                        ),
-                                        borderSide: BorderSide(
-                                          color: Colors.blue,
-                                        ),
-                                        onPressed: () async {
-                                          await DatabaseConnection.db
-                                              .deleteToDOItem(item.id);
-                                          setState(() {
-                                            this._switchValue = true;
-                                          });
-                                        }),
-                                  ],
-                                ))
-                          ],
-                        ),
-                      ));
-                },
-              );
-            } else {
-              return Center(child: CircularProgressIndicator());
-            }
-          }),
-    );
+                                            ),
+                                            onPressed: () async {
+                                              toDoItemBloc
+                                                  .add(DeleteToDoList(item.id));
+                                              toDoItemBloc.add(GetToDoList());
+                                            }),
+                                      ],
+                                    ))
+                              ],
+                            ),
+                          ));
+                    },
+                  );
+                } else {
+                  return Center(child: CircularProgressIndicator());
+                }
+              }),
+        ));
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 }
