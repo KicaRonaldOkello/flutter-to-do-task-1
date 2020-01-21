@@ -23,6 +23,7 @@ class Home extends StatelessWidget {
               Padding(
                 padding: EdgeInsets.only(left: 20.0, right: 20.0, top: 50.0),
                 child: TextField(
+                  key: Key('titleField'),
                   onChanged: (text) {
                     title = text;
                   },
@@ -38,6 +39,7 @@ class Home extends StatelessWidget {
               Padding(
                 padding: EdgeInsets.only(left: 20.0, right: 20.0, top: 40.0),
                 child: TextField(
+                  key: Key('descriptionField'),
                   onChanged: (text) {
                     itemDescription = text;
                   },
